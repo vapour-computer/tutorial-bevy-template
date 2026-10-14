@@ -1,0 +1,31 @@
+# Vapour tutorial workflow (from vapour-computer/vapour-ci templates/bevy-publish.yml).
+# - Every push/PR to this branch: build the web bundle with Trunk and check it (no secrets needed).
+# - Pushing a tag like v0.1.0: also publish to Vapour (needs the VAPOUR_TOKEN secret).
+# Note --dist dist: this template keeps source files in build/web, so the output must go elsewhere.
+name: vapour
+on:
+  push:
+    branches: [vapour-tutorial]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: wasm32-unknown-unknown }
+      - uses: Swatinem/rust-cache@v2
+      - name: Install trunk
+        run: cargo install trunk --locked
+      - name: Build for web
+        run: trunk build --release --public-url ./ --dist dist
+      - name: Check the bundle
+        run: test -f dist/index.html && ls -la dist
+      - name: Publish (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: vapour-computer/vapour-ci@v1
+        with:
+          token: ${{ secrets.VAPOUR_TOKEN }}
+          version: ${{ github.ref_name }}

@@ -1,0 +1,32 @@
+[project]
+title = "Bevy Game Template"
+slug = "tutorial-bevy-template"
+engine = "bevy"
+platform = "desktop"
+version = "0.1.0"
+
+# Trunk builds the web bundle. Its output folder must not be build/web:
+# this template keeps source files there (styles.css, sound.js) and Trunk empties its output folder.
+[build]
+command = "custom"
+args = ["trunk", "build", "--release", "--public-url", "./", "--dist", "dist"]
+dir = "dist"
+
+# One on-screen stick for phones. The game reads W/A/S/D (and the arrow keys).
+[controller]
+mode = "keyboard-map"
+
+[[controller.controls]]
+id = "move"
+type = "joystick"
+x = 0.22
+y = 0.74
+w = 0.30
+h = 0.30
+up = "w"
+down = "s"
+left = "a"
+right = "d"
+deadzone = 0.15
+sensitivity = 1.0
+repeat_hz = 60
