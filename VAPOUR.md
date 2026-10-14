@@ -6,7 +6,7 @@ This branch of [bevy_game_template](https://github.com/NiklasEi/bevy_game_templa
 | File | What it is |
 | --- | --- |
 | `vapour.toml` | Game manifest, a custom Trunk build (`build.command = "custom"`) and a one-stick phone `[controller]` |
-| `.github/workflows/vapour.yml` | Builds the web bundle on every push; publishes to Vapour on `v*` tags |
+| `.github/workflows/vapour-check.yml`, `vapour-publish.yml` | Builds the web bundle on every push; publishes to Vapour on `v*` tags (needs a released vapour-ci) |
 
 Output goes to `dist/`, not `build/web/`: upstream keeps source files in `build/web/` and Trunk empties its output folder.
 Upstream's license (CC0-1.0) is unchanged.

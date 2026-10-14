@@ -1,0 +1,22 @@
+# Builds the web bundle on every push and pull request. Needs no secrets and no Vapour action.
+# Output goes to dist/ because this template keeps source files in build/web and Trunk empties its output folder.
+name: vapour-check
+on:
+  push:
+    branches: [vapour-tutorial]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: wasm32-unknown-unknown }
+      - uses: Swatinem/rust-cache@v2
+      - name: Install trunk
+        run: cargo install trunk --locked
+      - name: Build for web
+        run: trunk build --release --public-url ./ --dist dist
+      - name: Check the bundle
+        run: test -f dist/index.html && ls -la dist

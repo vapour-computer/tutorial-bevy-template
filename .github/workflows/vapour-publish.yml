@@ -1,0 +1,24 @@
+# Publishes to Vapour when you push a tag like v0.1.0.
+# Needs: the VAPOUR_TOKEN repository secret, and a released vapour-computer/vapour-ci (the @v1 tag).
+# Adapted from templates/bevy-publish.yml in vapour-computer/vapour-ci: output goes to dist/ (see vapour-check.yml).
+name: vapour-publish
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: wasm32-unknown-unknown }
+      - uses: Swatinem/rust-cache@v2
+      - name: Install trunk
+        run: cargo install trunk --locked
+      - name: Build for web
+        run: trunk build --release --public-url ./ --dist dist
+      - uses: vapour-computer/vapour-ci@v1
+        with:
+          token: ${{ secrets.VAPOUR_TOKEN }}
+          dir: .
+          version: ${{ github.ref_name }}
