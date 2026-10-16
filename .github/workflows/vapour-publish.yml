@@ -1,0 +1,26 @@
+# Publishes to Vapour when you push a tag like v0.1.0.
+# Needs: the VAPOUR_TOKEN repository secret, and a released vapour-computer/vapour-ci (the @v1 tag).
+# This is templates/bevy-publish.yml from vapour-computer/vapour-ci.
+name: vapour-publish
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: jetli/trunk-action@v0.4.0
+      - name: Build web export
+        run: trunk build --release --public-url ./ --dist build/web
+      - name: Resolve publish version
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+      - uses: vapour-computer/vapour-ci@v1
+        with:
+          token: ${{ secrets.VAPOUR_TOKEN }}
+          version: ${{ steps.version.outputs.value }}
+          notes: "Release ${{ github.ref_name }}"
